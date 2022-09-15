@@ -2,7 +2,7 @@
 
 A nice path to practice Solidity and Smart Contract development.  
 **My current progress in the challenge:
-[Speed Run Ethereum Profile](https://speedrunethereum.com/builders/0xa935CEC3c5Ef99D7F1016674DEFd455Ef06776C5)**
+[Speed Run Ethereum Profile](https://buidlguidl.com/builders/0xa935CEC3c5Ef99D7F1016674DEFd455Ef06776C5)**
 
 ``` bash 
 git clone https://github.com/ggonzalez94/scaffold-eth-challenges.git
