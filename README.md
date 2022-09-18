@@ -50,6 +50,9 @@ git checkout challenge-3-dice-game
 ---
 
 ## 🚩 Challenge 4: Minimum Viable Exchange
-This challenge will help you build/understand a simple decentralized exchange, with one token-pair (ERC20 BALLOONS ($BAL) and ETH). This repo is an updated version of the [original tutorial](https://medium.com/@austin_48503/%EF%B8%8F-minimum-viable-exchange-d84f30bd0c90) and challenge repos before it.
+This challenge will help you build/understand a simple decentralized exchange, with one token-pair (ERC20 BALLOONS ($BAL) and ETH). This DEX is based on how [Uniswap V2](https://docs.uniswap.org/protocol/V2/concepts/protocol-overview/how-uniswap-works) works.  
+This repo is an updated version of the [original tutorial](https://medium.com/@austin_48503/%EF%B8%8F-minimum-viable-exchange-d84f30bd0c90) and challenge repos before it.
 
-⌚ In Progress
+``` bash 
+git checkout challenge-4-dex
+```
