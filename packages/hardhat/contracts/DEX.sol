@@ -6,17 +6,15 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title DEX Template
- * @author Gustavo Gonzalrz
+ * @author Gustavo Gonzalez
  * @dev Automatic market where our contract will hold reserves of both ETH and 🎈 Balloons. These reserves will provide liquidity that allows anyone to swap between the assets.
  */
 contract DEX {
     /* ========== GLOBAL VARIABLES ========== */
 
-    IERC20 private token; //instantiates the imported contract
+    IERC20 private token;
     uint256 public totalLiquidity = 0;
     mapping(address => uint256) public liquidity;
-
-    /* ========== EVENTS ========== */
 
     /**
      * @notice Emitted when ethToToken() swap transacted
@@ -36,15 +34,13 @@ contract DEX {
     /**
      * @notice Emitted when liquidity removed from DEX and decreases LPT count within DEX.
      */
-    event LiquidityRemoved();
+    event LiquidityRemoved(address sender, uint256 liquidityAmount, uint256 ethAmount, uint256 tokenAmount);
 
-    /* ========== CONSTRUCTOR ========== */
 
     constructor(address token_addr) {
         token = IERC20(token_addr); //specifies the token address that will hook into the interface and be used through the variable 'token'
     }
 
-    /* ========== MUTATIVE FUNCTIONS ========== */
 
     /**
      * @notice initializes amount of tokens that will be transferred to the DEX itself from the erc20 contract mintee (and only them based on how Balloons.sol is written). Loads contract up with both ETH and Balloons.
@@ -82,7 +78,9 @@ contract DEX {
      * if you are using a mapping liquidity, then you can use `return liquidity[lp]` to get the liquidity for a user.
      *
      */
-    function getLiquidity(address lp) public view returns (uint256) {}
+    function getLiquidity(address lp) public view returns (uint256) {
+        return liquidity[lp];
+    }
 
     /**
      * @notice sends Ether to DEX in exchange for $BAL
@@ -135,7 +133,7 @@ contract DEX {
         require(msg.value > 0, "cannot provide liquidity with 0 Eth");
         uint256 ethReserve = address(this).balance - msg.value; //same as ethToToken function the Smart contract balance is updated before running our code
         uint256 tokenReserve = token.balanceOf(address(this));
-        uint256 tokensToDeposit = (tokenReserve / ethReserve) * msg.value;
+        uint256 tokensToDeposit = (tokenReserve / ethReserve) * msg.value + 1;
 
         uint256 liquidityMinted = (msg.value * totalLiquidity) / ethReserve;
         liquidity[msg.sender] = liquidity[msg.sender] + liquidityMinted;
@@ -154,5 +152,21 @@ contract DEX {
     function withdraw(uint256 amount)
         public
         returns (uint256 eth_amount, uint256 token_amount)
-    {}
+    {
+        require(liquidity[msg.sender] >= amount, "sender does not have enough liquidity to withdraw.");
+        uint256 ethReserve = address(this).balance;
+        uint256 tokenReserve = token.balanceOf(address(this));
+        uint256 ethWithdrawn;
+
+        ethWithdrawn = (amount * ethReserve) / totalLiquidity;
+
+        uint256 tokenAmount = (amount * tokenReserve) / totalLiquidity;
+        liquidity[msg.sender] = liquidity[msg.sender] - amount;
+        totalLiquidity = totalLiquidity - amount;
+        (bool sent, ) = payable(msg.sender).call{ value: ethWithdrawn }("");
+        require(sent, "revert in transferring eth to you!");
+        require(token.transfer(msg.sender, tokenAmount));
+        emit LiquidityRemoved(msg.sender, amount, ethWithdrawn, tokenAmount);
+        return (ethWithdrawn, tokenAmount);
+    }
 }
